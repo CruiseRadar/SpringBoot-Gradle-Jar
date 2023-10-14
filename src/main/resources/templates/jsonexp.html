@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head> 
+        <title>Getting Started: Serving Web Content</title> 
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+            p, label {
+                display: block;
+                font: 1rem 'Fira Sans',sans-serif;
+            }
+            input, label {
+                margin: 0.4rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <p th:text="'현재시간 : , ' + ${time} + '!'" ></p>
+            <h1 th:text="'Json 표현'" ></h1>
+        </div>
+        <div>
+            <button name="ctlButton" id="ctlButton" class="ctlButton">Json 만들기</button>
+        </div>
+        <form id="form-data">
+            <div>
+                <input type="text" name="text-1" id="" class="">
+                <input type="text" name="text-2" id="" class="">
+                <input type="text" name="text-3" id="" class="">
+            </div>
+        </form>
+        <div>
+            <textarea id="jsonText" rows="8" cols="85"></textarea>
+        </div>
+    </body>
+    <script>
+        document.getElementById("ctlButton").addEventListener("click", function() {
+
+            alert("json 만들기");
+
+            event.preventDefault();
+            const form = document.getElementById('form-data');
+            
+            // 1: get form data
+            const formData = new FormData(form);
+            // 2: store form data in object
+            //const jsonObject = Object.fromEntries(formData); // ES10 이후
+            const jsonObject = formDataToObject(formData); // ES10 이전
+            // 3: convert form data object to a JSON string
+            const jsonString = JSON.stringify(jsonObject);
+
+            console.log(jsonString);
+
+            document.getElementById("jsonText").value = JSON.stringify(jsonObject, undefined, 4);
+
+        });
+
+        var formDataToObject = function (formData) {
+            const jsonObject = {};
+
+            for (const [key, value] of formData.entries()) {
+                jsonObject[key] = value;
+            }
+
+            return jsonObject;
+        };
+    </script>
+</html>

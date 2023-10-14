@@ -1,0 +1,129 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head> 
+        <title>Getting Started: Serving Web Content</title> 
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style>
+            p, label {
+                display: block;
+                font: 1rem 'Fira Sans',sans-serif;
+            }
+            input, label {
+                margin: 0.4rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <p th:text="'현재시간 : , ' + ${time} + '!'" ></p>
+            <h1 th:text="'API 테스트'" ></h1>
+        </div>
+        <div>
+            <button id="ctlBtnJson" class="ctlButton">JSON 만들기</button>
+            <button id="ctlBtnReqGet" class="ctlButton">Get 전송</button>
+            <button id="ctlButReqPost" class="ctlButton">Post 전송</button>
+        </div>
+        <form id="form-data">
+            <div>
+                <input type="text" name="text-1" id="" class="" value="text-1" />
+                <input type="text" name="text-2" id="" class="" value="text-2" />
+                <input type="text" name="text-3" id="" class="" value="text-3" />
+            </div>
+        </form>
+        <div>
+            <textarea id="jsonText" rows="8" cols="85"></textarea>
+        </div>
+        <div>
+            <textarea id="resultText" rows="8" cols="85"></textarea>
+        </div>
+    </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        document.getElementById("ctlBtnJson").addEventListener("click", function() { fnMakeJson(); });
+        document.getElementById("ctlBtnReqGet").addEventListener("click", function() { fnRequestAPIGetData(); });
+        document.getElementById("ctlButReqPost").addEventListener("click", function() { fnRequestAPIPostData(); });
+
+        var fnRequestAPIGetData = function() {
+            var reqData = fnMakeJson();
+            reqData = JSON.parse(reqData);
+            $.ajax({
+                type: 'get',   //get방식으로 명시
+                url : '/getjson',  //이동할 jsp 파일 주소
+                dataType: 'json',   //문자형식으로 받기
+                contentType: "application/json",
+                data: reqData,
+                success: function(data){   //데이터 주고받기 성공했을 경우 실행할 결과
+                    //function(data)를 쓰게 되면 전달받은 데이터가 data안에 담아서 들어오게 된다. 
+                    document.getElementById("resultText").value = JSON.stringify(data);
+                },
+                error:function(){   //데이터 주고받기가 실패했을 경우 실행할 결과
+                    document.getElementById("resultText").value = "실패";
+                }
+            })
+        };
+
+        var fnRequestAPIPostData = function() {
+            var reqData = fnMakeJson();
+            $.ajax({
+                type: 'post',   //get방식으로 명시
+                url : '/postjson',  //이동할 jsp 파일 주소
+                dataType: 'json',   //문자형식으로 받기
+                contentType: "application/json",
+                data: reqData,
+                success: function(data){   //데이터 주고받기 성공했을 경우 실행할 결과
+                    //function(data)를 쓰게 되면 전달받은 데이터가 data안에 담아서 들어오게 된다. 
+                    document.getElementById("resultText").value = JSON.stringify(data);
+                },
+                error:function(){   //데이터 주고받기가 실패했을 경우 실행할 결과
+                    document.getElementById("resultText").value = "실패";
+                }
+            })
+        };
+
+        var fnRequestAPIGetText = function() {
+            $.ajax({
+                type: 'get',   //get방식으로 명시
+                url : '/gettext',  //이동할 jsp 파일 주소
+                dataType: 'text',   //문자형식으로 받기
+                success: function(data){   //데이터 주고받기 성공했을 경우 실행할 결과
+                    //function(data)를 쓰게 되면 전달받은 데이터가 data안에 담아서 들어오게 된다. 
+                    document.getElementById("resultText").value = data;
+                },
+                error:function(){   //데이터 주고받기가 실패했을 경우 실행할 결과
+                    alert('실패');
+                }
+            })
+        };
+
+        var fnMakeJson = function() {
+
+            event.preventDefault();
+            const form = document.getElementById('form-data');
+            
+            // 1: get form data
+            const formData = new FormData(form);
+            // 2: store form data in object
+            //const jsonObject = Object.fromEntries(formData); // ES10 이후
+            const jsonObject = formDataToObject(formData); // ES10 이전
+            // 3: convert form data object to a JSON string
+            const jsonString = JSON.stringify(jsonObject);
+
+            console.log(jsonString);
+
+            document.getElementById("jsonText").value = JSON.stringify(jsonObject, undefined, 4);
+
+            return jsonString;
+
+        };
+
+        var formDataToObject = function (formData) {
+            const jsonObject = {};
+
+            for (const [key, value] of formData.entries()) {
+                jsonObject[key] = value;
+            }
+
+            return jsonObject;
+        };
+    </script>
+</html>
